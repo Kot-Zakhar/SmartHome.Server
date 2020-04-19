@@ -4,7 +4,6 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import passport from 'passport';
 
-import databaseConfig from './config/database'
 import authController from './controllers/auth/authController';
 import localStrategy from './passportStrategies/localStrategy';
 import googleStrategy from './passportStrategies/googleStrategy';
@@ -13,15 +12,21 @@ const log = debug('router');
 const api = express.Router();
 
 // connecting to db
-mongoose.connect(databaseConfig.database, { useNewUrlParser: true });
-mongoose.connection
-.on('connected', () => {
-  log('Connected to database ' + databaseConfig.database)
-})
-.on('error', (...err) => {
-  log('Error connecting to mongo: ' + JSON.stringify(err));
-})
-
+const databaseConnectionString = process.env.MONGODB_CONNECTION_STRING;
+const databaseSecret = process.env.MONGODB_SECRET;
+if (!databaseConnectionString || !databaseSecret) {
+  log("MongoDB credentials are not provided (MONGODB_CONNECTION_STRING or MONGODB_SECRET).");
+  throw new Error("No connection to MongoDB.");
+} else {
+  mongoose.connect(databaseConnectionString, { useNewUrlParser: true });
+  mongoose.connection
+  .on('connected', () => {
+    log('Connected to database ' + databaseConnectionString)
+  })
+  .on('error', (...err) => {
+    throw new Error("Error while connecting to Mongo: " + JSON.stringify(err));
+  })
+}
 
 api.use(bodyParser.json());
 
