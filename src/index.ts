@@ -1,35 +1,19 @@
-import express from 'express';
 import path from 'path';
-import cors from 'cors';
+import { Server } from './server';
 import dotenv from 'dotenv';
 
-dotenv.config();
-
-import api from './api';
-
-// debug and logs
-import debug from 'debug';
-import morgan from 'morgan';
-debug.enable('*');
-const log = debug("server");
-log("Logging is enabled.");
-
-
-
-const app = express();
-
-// middleware
-app.use(cors());
-app.use(morgan('tiny'));
-
-// routes
-app.use('/api', api);
+const result = dotenv.config();
 
 const port = process.env.PORT || 80;
 const staticFolder = process.env.PUBLIC || path.resolve('public');
 
-app.use(express.static(staticFolder));
+const app = new Server();
 
-const server = app.listen(port, () => log(`Http is started on ${port}. Static files are hosted from ${staticFolder}`));
+app.useCors();
+app.useMorgan('tiny');
+app.enableLogs('*');
 
-log(server.address());
+app.mountApi('/api');
+app.useStaticFolder(staticFolder);
+app.listen(port, () => console.log(`Http is started on ${port}. Static files are hosted from ${staticFolder}`));
+
