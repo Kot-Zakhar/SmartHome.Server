@@ -2,7 +2,7 @@ import { OAuth2Strategy as Strategy } from 'passport-google-oauth';
 import env from '../environments/environment';
 import debug from 'debug';
 
-const log = debug("googleStrategy");
+const log = debug("app:GoogleStrategy");
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
 if (!googleClientId)
@@ -12,7 +12,7 @@ if (!googleClientSecret)
     log("GOOGLE_CLIENT_SECRET is not provided.");
 const googleCallbackUrl = env.googleAuthCallbackUrl;
 
-export default new Strategy({
+export const googleStrategy = new Strategy({
     clientID: googleClientId,
     clientSecret: googleClientSecret,
     callbackURL: googleCallbackUrl

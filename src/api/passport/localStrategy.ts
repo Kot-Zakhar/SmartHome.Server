@@ -1,13 +1,28 @@
 import { Strategy } from 'passport-local';
+import debug from 'debug';
+import User from '../models/user';
 
-export default new Strategy(
-    (username, password, done) => {
-        // TODO: implement search of the user by username and passowrd
-        if (username != "test")
-            return done(null, false, { message: "Incorrect username" });
-        if (password != "test")
-            return done(null, false, { message: "Wrong password." });
-        
-        return done(null, { username: "test" });
+const log = debug("app:LocalStrategy");
+
+export const localStrategy = new Strategy({
+        usernameField: 'email',
+        passwordField: 'password'
+    },
+    async (email, password, done) => {
+        try {
+            log(`searching the user(${email},${password})`);
+            // TODO: implement hashing the password
+            let user = await User.findOne({
+                where: {
+                    email,
+                    passwordHash: password
+                }
+            });
+            log(`found: ${JSON.stringify(user, null, 2)}`);
+            return done(null, user);
+        } catch (err) {
+            log(`Couldn't find a user: ${err}`);
+            return done(null, false, { message: "Incorrect credentials." })
+        }
     }
 );

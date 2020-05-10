@@ -1,5 +1,5 @@
 import { Router } from "express";
 
-export interface Controller {
-    getRouter(): Router;
+export default interface Controller {
+    readonly router: Router;
 }

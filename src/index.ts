@@ -1,19 +1,18 @@
 import path from 'path';
-import { Server } from './server';
+import HttpServer from './httpServer';
 import dotenv from 'dotenv';
+import SocketServer from './socketServer/socketServer';
+import debug from 'debug';
+
+debug.enable("*");
+debug("app:Index")("Logging is enabled");
 
 const result = dotenv.config();
 
-const port = process.env.PORT || 80;
+const httpPort = Number.parseInt(process.env.HTTP_PORT || "80");
 const staticFolder = process.env.PUBLIC || path.resolve('public');
 
-const app = new Server();
+const app = new HttpServer(httpPort, staticFolder);
 
-app.useCors();
-app.useMorgan('tiny');
-app.enableLogs('*');
-
-app.mountApi('/api');
-app.useStaticFolder(staticFolder);
-app.listen(port, () => console.log(`Http is started on ${port}. Static files are hosted from ${staticFolder}`));
-
+const socketPort = Number.parseInt(process.env.SOCKET_PORT || "8080");
+// const socketServer = new SocketServer(socketPort);
